@@ -7,26 +7,71 @@ output:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 
 ## Loading and preprocessing the data  
 Code to read data  
-```{r, cache=TRUE}
+
+```r
 data <- read.csv(unz("activity.zip", "activity.csv"),stringsAsFactors=FALSE,na.strings = "NA")
 ```
 
 The data contains the number of steps taken by an individual in 5 minute intervals for two months. October and November, 2012.
 Records range from 0 to 2355 minutes everyday for 61 days.
 
-```{r}
+
+```r
 nrow(data)
+```
+
+```
+## [1] 17568
+```
+
+```r
 names(data)
+```
+
+```
+## [1] "steps"    "date"     "interval"
+```
+
+```r
 head(data)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 length(unique(data$date))
+```
+
+```
+## [1] 61
+```
+
+```r
 summary(data)
+```
+
+```
+##      steps            date              interval     
+##  Min.   :  0.00   Length:17568       Min.   :   0.0  
+##  1st Qu.:  0.00   Class :character   1st Qu.: 588.8  
+##  Median :  0.00   Mode  :character   Median :1177.5  
+##  Mean   : 37.38                      Mean   :1177.5  
+##  3rd Qu.: 12.00                      3rd Qu.:1766.2  
+##  Max.   :806.00                      Max.   :2355.0  
+##  NA's   :2304
 ```
 ## What is mean total number of steps taken per day? 
 
@@ -34,7 +79,8 @@ Number of readings per day = total number of readings/number of days = 17568/61 
 
 Histogram of total steps:  
 
-```{r, cache=TRUE}
+
+```r
 start = 0
 steps= c()
 for (i in seq(61)) 
@@ -48,16 +94,31 @@ abline(v=mean(steps),col="red",lwd=2)
 abline(v=median(steps),col="blue",lwd=2)
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+
+```r
 print(mean(steps))
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 print(median(steps))
+```
+
+```
+## [1] 10395
 ```
 
 The mean of total steps taken each day is 9354.23, and the median is 10395. These values are highlighted in the histogram as red and blue lines. 
 
 ## What is the average daily activity pattern?
 
-```{r, cache=TRUE}
+
+```r
 daily_means =c()
 j=1
 for (i in unique(data$interval)) 
@@ -67,25 +128,40 @@ plot(unique(data$interval),daily_means, type='l', main="Avg steps in different i
 abline(v=835,col="green", lwd=2)
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+
+```r
 id <- which.max(daily_means)
 unique(data$interval)[id]
+```
+
+```
+## [1] 835
 ```
 The time interval 835 has highes average number of steps  
 
 ## Imputing missing values
 
-```{r}
+
+```r
 for (i in seq(ncol(data)))
 {
 print(sum(is.na(data[,i])))
 }
 ```
 
+```
+## [1] 2304
+## [1] 0
+## [1] 0
+```
+
 There are 2304 missing (NA) values in steps column. No missing data in other columns   
 We use mean of steps taken in each 5 minute interval, that we have already calculated, to fill the missing values.   We use this method as the time affects the number of steps (ex: a person might exercise at a particular time everyday)  
 
-```{r, cache=TRUE}
+
+```r
 imputed_data <- data
 j=1
 for (i in unique(data$interval))
@@ -99,7 +175,8 @@ for (i in unique(data$interval))
   
 Plotting histogram for imputed data:  
 
-```{r, cache=TRUE}
+
+```r
 start = 0
 imputed_steps= c()
 for (i in seq(61)) 
@@ -113,12 +190,40 @@ abline(v=mean(imputed_steps),col="red",lwd=2)
 abline(v=median(imputed_steps),col="blue",lwd=2)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
-```{r}
+
+
+```r
 print(mean(imputed_steps))
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 print(median(imputed_steps))
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 (10766.19-9354.23)
+```
+
+```
+## [1] 1411.96
+```
+
+```r
 (10766.19-10395)
+```
+
+```
+## [1] 371.19
 ```
 
 Mean and median values have become same, that is 10766.19. It is highlighetd in the histogram.  
@@ -129,7 +234,8 @@ Due to imputation, the mean and median have increased. It has also increased the
 
 Creating weekday factor:    
 
-```{r, cache= TRUE}
+
+```r
 imputed_data$date <- as.Date(imputed_data$date)
 days <- weekdays(imputed_data$date)
 i=1
@@ -150,13 +256,50 @@ imputed_data$day_type <- as.factor(day_type)
 summary(imputed_data)
 ```
 
+```
+##      steps             date               interval         day_type    
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0   weekday:12960  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8   weekend: 4608  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5                  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5                  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2                  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
+```
+
 Plotting average steps:  
 
-```{r, cache= TRUE}
+
+```r
 library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.6.2
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 filtered_data <- data.frame(imputed_data %>% group_by(day_type,interval) %>% summarise(avg = mean(steps)))
 ggplot(filtered_data, aes(interval,avg)) +
   geom_line() +
   facet_grid(day_type~.)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
